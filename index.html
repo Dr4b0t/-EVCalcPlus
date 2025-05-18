@@ -2,172 +2,137 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#2d203a" />
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" type="image/png" href="icon.png" />
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
   <title>EVCalc+</title>
   <style>
     body {
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #1b1a23;
-      color: #eee;
+      font-family: 'Roboto', sans-serif;
+      background-color: #121212;
+      color: #e0e0e0;
     }
-    header {
-      background-color: #392749;
-      padding: 1rem;
-      text-align: center;
-      color: #f2e8fc;
-    }
-    main {
-      padding: 1.5rem;
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 2rem;
     }
     h1 {
-      font-size: 1.8rem;
-      color: #f2e8fc;
+      color: #bb86fc;
     }
-    label, input, select, button {
-      display: block;
+    input, select, button {
+      width: 100%;
       margin: 0.5rem 0;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 1rem;
     }
     input, select {
-      width: 100%;
-      padding: 0.5rem;
-      background-color: #2e2c39;
-      border: 1px solid #544766;
-      color: #eee;
-      border-radius: 6px;
+      background-color: #1f1f1f;
+      color: #fff;
     }
     button {
-      background-color: #7c4fc9;
+      background-color: #3700b3;
       color: white;
-      border: none;
-      padding: 0.6rem 1rem;
-      border-radius: 8px;
       cursor: pointer;
-      transition: background-color 0.2s;
     }
     button:hover {
-      background-color: #9c6eea;
+      background-color: #6200ea;
     }
-    .hidden {
-      display: none;
-    }
-    #tips {
-      background-color: #2a2133;
-      border-left: 5px solid #c47aff;
-      padding: 1rem;
-      margin-bottom: 1rem;
-    }
-    #moreFeatures {
-      background-color: #241c2c;
-      padding: 1rem;
+    .result {
       margin-top: 1rem;
-      border-radius: 10px;
-    }
-    .notice {
-      background-color: #3a2a4a;
-      padding: 0.5rem 1rem;
-      margin: 1rem 0;
-      border-left: 4px solid #c88aff;
-      font-size: 0.9rem;
+      padding: 1rem;
+      background-color: #1f1f1f;
+      border-radius: 0.5rem;
     }
   </style>
 </head>
 <body>
-  <header>
+  <div class="container">
     <h1>EVCalc+</h1>
-  </header>
-  <main>
-    <div id="tips" class="hidden"></div><label for="batterySize">Battery Size (kWh)</label>
-<input type="number" id="batterySize" value="60.4" step="0.1" />
+    <label>Battery Capacity (kWh):</label>
+    <input type="number" id="capacity" value="60.4" step="0.1"><label>Current Battery %:</label>
+<input type="number" id="current" value="65">
 
-<label for="currentPercent">Current Battery %</label>
-<input type="number" id="currentPercent" value="65" />
+<label>Target Battery %:</label>
+<input type="number" id="target" value="90">
 
-<label for="targetPercent">Target Battery %</label>
-<input type="number" id="targetPercent" value="90" />
+<label>Charging Speed (kW):</label>
+<input type="number" id="speed" value="6.3" step="0.1">
 
-<label for="chargeSpeed">Charging Speed (kW)</label>
-<input type="number" id="chargeSpeed" value="6.9" step="0.1" />
+<button onclick="calculateTime()">Estimate Charge Time</button>
 
-<button onclick="estimateChargeTime()">Estimate Charge Time</button>
-<div id="result"></div>
+<div class="result" id="output"></div>
 
-<button onclick="toggleMore()">More</button>
-<div id="moreFeatures" class="hidden">
-  <label for="consumption">Average Consumption (kWh/100km)</label>
-  <input type="number" id="consumption" value="13.5" step="0.1" oninput="convertConsumption()" />
-  <div id="converted"></div>
+<hr>
 
-  <button onclick="saveLog()">Save Charging Session</button>
-  <button onclick="exportLogs()">Export Logs (CSV)</button>
-  <div id="logStatus"></div>
-</div>
+<label>Consumption (kWh/100km):</label>
+<input type="number" id="consumption" value="13.5" step="0.1">
+<button onclick="convertEfficiency()">Convert to km/kWh</button>
+<div class="result" id="efficiencyOutput"></div>
 
-  </main>
-  <script>
-    let logs = JSON.parse(localStorage.getItem('evLogs') || '[]');function estimateChargeTime() {
-  const battery = parseFloat(document.getElementById('batterySize').value);
-  const current = parseFloat(document.getElementById('currentPercent').value);
-  const target = parseFloat(document.getElementById('targetPercent').value);
-  const speed = parseFloat(document.getElementById('chargeSpeed').value);
+<hr>
 
-  if (target > 90) {
-    showTip("Charging to more than 90% regularly can reduce battery lifespan.");
-  } else {
-    hideTip();
-  }
+<label>Currency:</label>
+<select id="currency">
+  <option value="USD">USD</option>
+  <option value="EUR">EUR</option>
+  <option value="IDR">IDR</option>
+  <option value="JPY">JPY</option>
+</select>
 
-  const kWhNeeded = ((target - current) / 100) * battery;
-  const hours = kWhNeeded / speed;
-  const result = `Estimated time: ${hours.toFixed(2)} hours<br>kWh needed: ${kWhNeeded.toFixed(2)} kWh`;
-  document.getElementById('result').innerHTML = result;
-}
+<label>Cost per kWh:</label>
+<input type="number" id="cost" value="0.15" step="0.01">
+<button onclick="calculateCost()">Estimate Charging Cost</button>
+<div class="result" id="costOutput"></div>
 
-function showTip(text) {
-  const tips = document.getElementById('tips');
-  tips.textContent = text;
-  tips.classList.remove('hidden');
-}
+  </div>  <script>
+    function calculateTime() {
+      const cap = parseFloat(document.getElementById('capacity').value);
+      const cur = parseFloat(document.getElementById('current').value);
+      const tgt = parseFloat(document.getElementById('target').value);
+      const spd = parseFloat(document.getElementById('speed').value);
+      const output = document.getElementById('output');
+      const percentToAdd = tgt - cur;
+      const energyNeeded = (percentToAdd / 100) * cap;
+      const time = energyNeeded / spd;
 
-function hideTip() {
-  document.getElementById('tips').classList.add('hidden');
-}
+      output.innerHTML = `Estimated charging time: ${time.toFixed(2)} hours<br>
+        Energy to add: ${energyNeeded.toFixed(2)} kWh<br>
+        Battery after charge: ${(cur + percentToAdd).toFixed(1)}%`;
+    }
 
-function convertConsumption() {
-  const val = parseFloat(document.getElementById('consumption').value);
-  if (val > 0) {
-    const kmPerKWh = 100 / val;
-    document.getElementById('converted').textContent = `≈ ${kmPerKWh.toFixed(2)} km per kWh`;
-  }
-}
+    function convertEfficiency() {
+      const consumption = parseFloat(document.getElementById('consumption').value);
+      const kmPerKwh = 100 / consumption;
+      document.getElementById('efficiencyOutput').innerText = `≈ ${kmPerKwh.toFixed(2)} km/kWh`;
+    }
 
-function toggleMore() {
-  document.getElementById('moreFeatures').classList.toggle('hidden');
-}
+    function calculateCost() {
+      const cap = parseFloat(document.getElementById('capacity').value);
+      const cur = parseFloat(document.getElementById('current').value);
+      const tgt = parseFloat(document.getElementById('target').value);
+      const cost = parseFloat(document.getElementById('cost').value);
+      const currency = document.getElementById('currency').value;
 
-function saveLog() {
-  const date = new Date().toISOString();
-  const battery = parseFloat(document.getElementById('batterySize').value);
-  const current = parseFloat(document.getElementById('currentPercent').value);
-  const target = parseFloat(document.getElementById('targetPercent').value);
-  const speed = parseFloat(document.getElementById('chargeSpeed').value);
-  const kWhNeeded = ((target - current) / 100) * battery;
-  logs.push({ date, battery, current, target, speed, kWhAdded: kWhNeeded });
-  localStorage.setItem('evLogs', JSON.stringify(logs));
-  document.getElementById('logStatus').textContent = "Session saved locally.";
-}
+      const percentToAdd = tgt - cur;
+      const energyNeeded = (percentToAdd / 100) * cap;
+      const totalCost = energyNeeded * cost;
 
-function exportLogs() {
-  const csv = logs.map(l => `${l.date},${l.battery},${l.current},${l.target},${l.speed},${l.kWhAdded}`).join("\n");
-  const blob = new Blob(["Date,Battery Size,Current %,Target %,Speed (kW),kWh Added\n" + csv], { type: 'text/csv' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = "evcalc_logs.csv";
-  link.click();
-}
+      document.getElementById('costOutput').innerText = `Estimated cost: ${currency} ${totalCost.toFixed(2)}`;
+    }
 
-  </script>
-</body>
+    // LocalStorage persistence
+    window.onload = () => {
+      ['capacity', 'current', 'target', 'speed', 'consumption', 'cost', 'currency'].forEach(id => {
+        const el = document.getElementById(id);
+        if (localStorage.getItem(id)) {
+          if (el.tagName === 'SELECT') el.value = localStorage.getItem(id);
+          else el.value = parseFloat(localStorage.getItem(id));
+        }
+        el.addEventListener('change', () => localStorage.setItem(id, el.value));
+      });
+    };
+  </script></body>
 </html>
