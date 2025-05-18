@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#1e1b2e"/>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon.png" />
+  <title>EVCalc+</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #1e1b2e;
+      color: #e5dbff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    h1 {
+      color: #c9aaff;
+    }
+    .container {
+      background: #2a263d;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.4);
+      max-width: 400px;
+      width: 90%;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+    input, select {
+      background: #3a3452;
+      color: #e5dbff;
+    }
+    button {
+      background: #7c3aed;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #6d28d9;
+    }
+    .output {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔋 EVCalc+</h1>
+    <label>Battery Size (kWh):</label>
+    <input type="number" id="batterySize" value="60.4" />
+
+    <label>Current Battery %:</label>
+    <input type="number" id="currentPercent" value="65" />
+
+    <label>Target Battery %:</label>
+    <input type="number" id="targetPercent" value="90" />
+
+    <label>Charger Power (kW):</label>
+    <input type="number" id="chargerSpeed" value="25" />
+
+    <label>Average Consumption (kWh/100km):</label>
+    <input type="number" id="consumption" value="13.5" />
+
+    <button onclick="calculate()">🔧 Calculate</button>
+
+    <div class="output" id="output"></div>
+  </div>
+
+  <script>
+    function calculate() {
+      const batterySize = parseFloat(document.getElementById("batterySize").value);
+      const currentPercent = parseFloat(document.getElementById("currentPercent").value);
+      const targetPercent = parseFloat(document.getElementById("targetPercent").value);
+      const chargerSpeed = parseFloat(document.getElementById("chargerSpeed").value);
+      const consumption = parseFloat(document.getElementById("consumption").value);
+
+      const energyNeeded = (targetPercent - currentPercent) / 100 * batterySize;
+      const timeHours = energyNeeded / chargerSpeed;
+      const estimatedRange = (batterySize * targetPercent / 100) / (consumption / 100);
+
+      document.getElementById("output").innerHTML = `⚡ Energy Needed: ${energyNeeded.toFixed(2)} kWh<br>
+        ⏱️ Time Required: ${timeHours.toFixed(2)} hours<br>
+        🚗 Estimated Range: ${estimatedRange.toFixed(0)} km`;
+    }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js').then(reg => {
+        reg.onupdatefound = () => {
+          const newWorker = reg.installing;
+          newWorker.onstatechange = () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              window.location.reload();
+            }
+          };
+        };
+      });
+    }
+  </script>
+</body>
+</html>

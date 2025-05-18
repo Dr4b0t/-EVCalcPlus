@@ -1,0 +1,15 @@
+{
+  "name": "EVCalc+",
+  "short_name": "EVCalc+",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#1e1b2e",
+  "theme_color": "#1e1b2e",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
