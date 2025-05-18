@@ -3,162 +3,136 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="icon.png">
-  <meta name="theme-color" content="#1e1b2e">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
   <title>EVCalc+</title>
   <style>
-    :root {
-      --bg-color: #1e1b2e;
-      --card-color: #2a253a;
-      --text-color: #f0eaff;
-      --accent: #9a5cff;
-    }
     body {
       margin: 0;
-      padding: 0;
-      font-family: system-ui, sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
+      font-family: 'Roboto', sans-serif;
+      background-color: #121212;
+      color: #e0e0e0;
     }
-    main {
-      padding: 1rem;
-      max-width: 700px;
+    .container {
+      max-width: 600px;
       margin: auto;
+      padding: 2rem;
     }
     h1 {
-      text-align: center;
-      color: var(--accent);
+      color: #bb86fc;
     }
-    .card {
-      background: var(--card-color);
-      padding: 1rem;
-      margin-bottom: 1rem;
-      border-radius: 1rem;
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
-    }
-    label, select, input {
-      display: block;
-      margin-bottom: 0.5rem;
+    input, select, button {
       width: 100%;
+      margin: 0.5rem 0;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 1rem;
     }
     input, select {
-      padding: 0.5rem;
-      border-radius: 0.5rem;
-      border: none;
-      background: #3a334d;
-      color: var(--text-color);
+      background-color: #1f1f1f;
+      color: #fff;
     }
     button {
-      padding: 0.75rem;
-      background: var(--accent);
-      border: none;
-      border-radius: 0.75rem;
+      background-color: #3700b3;
       color: white;
-      font-weight: bold;
       cursor: pointer;
-      width: 100%;
-      margin-top: 0.5rem;
+    }
+    button:hover {
+      background-color: #6200ea;
     }
     .result {
-      font-weight: bold;
-      margin-top: 0.5rem;
-      text-align: center;
+      margin-top: 1rem;
+      padding: 1rem;
+      background-color: #1f1f1f;
+      border-radius: 0.5rem;
     }
   </style>
 </head>
 <body>
-  <main>
-    <h1>EVCalc+</h1><div class="card">
-  <label>Current Battery %:</label>
-  <input type="number" id="currentPercent" min="0" max="100" />
+  <div class="container">
+    <h1>EVCalc+</h1>
+    <label>Battery Capacity (kWh):</label>
+    <input type="number" id="capacity" value="60.4" step="0.1"><label>Current Battery %:</label>
+<input type="number" id="current" value="65">
 
-  <label>Target Battery %:</label>
-  <input type="number" id="targetPercent" min="0" max="100" />
+<label>Target Battery %:</label>
+<input type="number" id="target" value="90">
 
-  <label>Battery Capacity (kWh):</label>
-  <input type="number" id="batteryCapacity" value="60.4" />
+<label>Charging Speed (kW):</label>
+<input type="number" id="speed" value="6.3" step="0.1">
 
-  <label>Charger Speed (kW):</label>
-  <input type="number" id="chargerSpeed" />
+<button onclick="calculateTime()">Estimate Charge Time</button>
 
-  <button onclick="calculateTime()">Estimate Charge Time</button>
-  <div class="result" id="timeResult"></div>
-</div>
+<div class="result" id="output"></div>
 
-<div class="card">
-  <label>Average Consumption (kWh/100km):</label>
-  <input type="number" id="kwhPer100km" step="0.1" />
+<hr>
 
-  <button onclick="convertEfficiency()">Convert to km/kWh</button>
-  <div class="result" id="efficiencyResult"></div>
-</div>
+<label>Consumption (kWh/100km):</label>
+<input type="number" id="consumption" value="13.5" step="0.1">
+<button onclick="convertEfficiency()">Convert to km/kWh</button>
+<div class="result" id="efficiencyOutput"></div>
 
-<div class="card">
-  <label>Cost per kWh:</label>
-  <input type="number" id="costPerKWh" />
+<hr>
 
-  <label>Currency:</label>
-  <select id="currency">
-    <option value="USD">USD</option>
-    <option value="EUR">EUR</option>
-    <option value="IDR">IDR</option>
-    <option value="JPY">JPY</option>
-  </select>
+<label>Currency:</label>
+<select id="currency">
+  <option value="USD">USD</option>
+  <option value="EUR">EUR</option>
+  <option value="IDR">IDR</option>
+  <option value="JPY">JPY</option>
+</select>
 
-  <button onclick="estimateCost()">Estimate Charge Cost</button>
-  <div class="result" id="costResult"></div>
-</div>
+<label>Cost per kWh:</label>
+<input type="number" id="cost" value="0.15" step="0.01">
+<button onclick="calculateCost()">Estimate Charging Cost</button>
+<div class="result" id="costOutput"></div>
 
-  </main>
-  <script>
+  </div>  <script>
     function calculateTime() {
-      const cur = parseFloat(currentPercent.value);
-      const target = parseFloat(targetPercent.value);
-      const cap = parseFloat(batteryCapacity.value);
-      const speed = parseFloat(chargerSpeed.value);
-      if (target > cur && speed > 0) {
-        const toCharge = (target - cur) / 100 * cap;
-        const hours = toCharge / speed;
-        timeResult.innerText = `Estimated Time: ${hours.toFixed(2)} hours`;
-      } else {
-        timeResult.innerText = "Check your inputs";
-      }
-    }function convertEfficiency() {
-  const kwh = parseFloat(kwhPer100km.value);
-  if (kwh > 0) {
-    const kmPerKwh = 100 / kwh;
-    efficiencyResult.innerText = `${kmPerKwh.toFixed(2)} km per kWh`;
-  } else {
-    efficiencyResult.innerText = "Invalid input";
-  }
-}
+      const cap = parseFloat(document.getElementById('capacity').value);
+      const cur = parseFloat(document.getElementById('current').value);
+      const tgt = parseFloat(document.getElementById('target').value);
+      const spd = parseFloat(document.getElementById('speed').value);
+      const output = document.getElementById('output');
+      const percentToAdd = tgt - cur;
+      const energyNeeded = (percentToAdd / 100) * cap;
+      const time = energyNeeded / spd;
 
-function estimateCost() {
-  const cur = parseFloat(currentPercent.value);
-  const target = parseFloat(targetPercent.value);
-  const cap = parseFloat(batteryCapacity.value);
-  const price = parseFloat(costPerKWh.value);
-  const unit = currency.value;
-  if (target > cur && price >= 0) {
-    const toCharge = (target - cur) / 100 * cap;
-    const cost = toCharge * price;
-    costResult.innerText = `Estimated Cost: ${cost.toFixed(2)} ${unit}`;
-  } else {
-    costResult.innerText = "Check your inputs";
-  }
-}
+      output.innerHTML = `Estimated charging time: ${time.toFixed(2)} hours<br>
+        Energy to add: ${energyNeeded.toFixed(2)} kWh<br>
+        Battery after charge: ${(cur + percentToAdd).toFixed(1)}%`;
+    }
 
-// Persistent local settings
-window.onload = () => {
-  batteryCapacity.value = localStorage.getItem("batteryCapacity") || "60.4";
-  costPerKWh.value = localStorage.getItem("costPerKWh") || "";
-  currency.value = localStorage.getItem("currency") || "USD";
-};
+    function convertEfficiency() {
+      const consumption = parseFloat(document.getElementById('consumption').value);
+      const kmPerKwh = 100 / consumption;
+      document.getElementById('efficiencyOutput').innerText = `≈ ${kmPerKwh.toFixed(2)} km/kWh`;
+    }
 
-batteryCapacity.oninput = () => localStorage.setItem("batteryCapacity", batteryCapacity.value);
-costPerKWh.oninput = () => localStorage.setItem("costPerKWh", costPerKWh.value);
-currency.onchange = () => localStorage.setItem("currency", currency.value);
+    function calculateCost() {
+      const cap = parseFloat(document.getElementById('capacity').value);
+      const cur = parseFloat(document.getElementById('current').value);
+      const tgt = parseFloat(document.getElementById('target').value);
+      const cost = parseFloat(document.getElementById('cost').value);
+      const currency = document.getElementById('currency').value;
 
-  </script>
-</body>
+      const percentToAdd = tgt - cur;
+      const energyNeeded = (percentToAdd / 100) * cap;
+      const totalCost = energyNeeded * cost;
+
+      document.getElementById('costOutput').innerText = `Estimated cost: ${currency} ${totalCost.toFixed(2)}`;
+    }
+
+    // LocalStorage persistence
+    window.onload = () => {
+      ['capacity', 'current', 'target', 'speed', 'consumption', 'cost', 'currency'].forEach(id => {
+        const el = document.getElementById(id);
+        if (localStorage.getItem(id)) {
+          if (el.tagName === 'SELECT') el.value = localStorage.getItem(id);
+          else el.value = parseFloat(localStorage.getItem(id));
+        }
+        el.addEventListener('change', () => localStorage.setItem(id, el.value));
+      });
+    };
+  </script></body>
 </html>
