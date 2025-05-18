@@ -3,15 +3,9 @@
   "short_name": "EVCalc+",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#1e1b29",
-  "theme_color": "#9a71d1",
-  "orientation": "portrait",
+  "background_color": "#1e1b2e",
+  "theme_color": "#1e1b2e",
   "icons": [
-    {
-      "src": "icon.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
     {
       "src": "icon.png",
       "sizes": "512x512",
