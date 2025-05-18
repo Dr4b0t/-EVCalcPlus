@@ -1,26 +1,28 @@
-self.addEventListener("install", event => {
-  self.skipWaiting();
+const cacheName = 'evcalc-cache-v2';
+const filesToCache = [
+  './',
+  './index.html',
+  './manifest.json',
+  './icon.png'
+];
+
+self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open("evcalc-v1").then(cache => {
-      return cache.addAll(["index.html", "manifest.json", "icon.png"]);
-    })
+    caches.open(cacheName).then(cache => cache.addAll(filesToCache))
   );
 });
 
-self.addEventListener("activate", event => {
-  event.waitUntil(self.clients.claim());
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(keys => Promise.all(
+      keys.filter(key => key !== cacheName)
+          .map(key => caches.delete(key))
+    ))
+  );
 });
 
-self.addEventListener("fetch", event => {
+self.addEventListener('fetch', event => {
   event.respondWith(
-    fetch(event.request)
-      .then(response => {
-        const clone = response.clone();
-        caches.open("evcalc-v1").then(cache => {
-          cache.put(event.request, clone);
-        });
-        return response;
-      })
-      .catch(() => caches.match(event.request))
+    caches.match(event.request).then(response => response || fetch(event.request))
   );
 });
