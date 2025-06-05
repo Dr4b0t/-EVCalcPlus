@@ -1,138 +1,936 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
   <title>EVCalc+</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+    
     body {
       margin: 0;
-      font-family: 'Roboto', sans-serif;
-      background-color: #121212;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
       color: #e0e0e0;
+      min-height: 100vh;
     }
+    
     .container {
-      max-width: 600px;
+      max-width: 800px;
       margin: auto;
-      padding: 2rem;
+      padding: 1.5rem;
     }
+    
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    
     h1 {
       color: #bb86fc;
+      font-size: 2.5rem;
+      margin: 0;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
     }
-    input, select, button {
+    
+    .logo-icon {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #bb86fc 0%, #6200ea 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+    
+    .subtitle {
+      color: #9575cd;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+    }
+    
+    .car-selector {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      border: 1px solid rgba(187, 134, 252, 0.2);
+    }
+    
+    .car-display {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    
+    .car-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .car-icon {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #6200ea 0%, #3700b3 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+    
+    .car-details h3 {
+      margin: 0;
+      color: #bb86fc;
+      font-size: 1.2rem;
+    }
+    
+    .car-details p {
+      margin: 0.25rem 0 0 0;
+      color: #9575cd;
+      font-size: 0.9rem;
+    }
+    
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid rgba(187, 134, 252, 0.2);
+      transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(187, 134, 252, 0.4);
+      box-shadow: 0 8px 24px rgba(187, 134, 252, 0.15);
+    }
+    
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      color: #bb86fc;
+    }
+    
+    .card-header h2 {
+      margin: 0;
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+    
+    .input-group {
+      margin-bottom: 1.2rem;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      color: #9575cd;
+      font-weight: 500;
+    }
+    
+    input, select {
       width: 100%;
-      margin: 0.5rem 0;
+      padding: 0.875rem;
+      border: 2px solid transparent;
+      border-radius: 12px;
+      font-size: 1rem;
+      background: rgba(31, 31, 31, 0.8);
+      color: #fff;
+      transition: all 0.3s ease;
+    }
+    
+    input:focus, select:focus {
+      outline: none;
+      border-color: #bb86fc;
+      background: rgba(31, 31, 31, 1);
+    }
+    
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    
+    button {
+      width: 100%;
+      padding: 1rem;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #6200ea 0%, #3700b3 100%);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(98, 0, 234, 0.35);
+    }
+    
+    .btn-secondary {
+      background: rgba(187, 134, 252, 0.2);
+      color: #bb86fc;
+      font-size: 0.9rem;
+      padding: 0.75rem;
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(187, 134, 252, 0.3);
+    }
+    
+    .result {
+      margin-top: 1.2rem;
+      padding: 1.2rem;
+      background: rgba(98, 0, 234, 0.1);
+      border-radius: 12px;
+      border: 1px solid rgba(187, 134, 252, 0.3);
+      display: none;
+    }
+    
+    .result.show {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .result-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .result-item:last-child {
+      border-bottom: none;
+    }
+    
+    .result-label {
+      color: #9575cd;
+      font-size: 0.9rem;
+    }
+    
+    .result-value {
+      color: #fff;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+    
+    .result-value.highlight {
+      color: #bb86fc;
+      font-size: 1.3rem;
+    }
+    
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 0.5rem;
+      border-radius: 12px;
+    }
+    
+    .tab {
+      flex: 1;
       padding: 0.75rem;
       border: none;
-      border-radius: 0.5rem;
-      font-size: 1rem;
-    }
-    input, select {
-      background-color: #1f1f1f;
-      color: #fff;
-    }
-    button {
-      background-color: #3700b3;
-      color: white;
+      border-radius: 8px;
+      background: transparent;
+      color: #9575cd;
       cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
     }
-    button:hover {
-      background-color: #6200ea;
+    
+    .tab.active {
+      background: linear-gradient(135deg, #6200ea 0%, #3700b3 100%);
+      color: white;
     }
-    .result {
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
       margin-top: 1rem;
+    }
+    
+    .stat-card {
+      background: rgba(98, 0, 234, 0.1);
       padding: 1rem;
-      background-color: #1f1f1f;
-      border-radius: 0.5rem;
+      border-radius: 12px;
+      text-align: center;
+      border: 1px solid rgba(187, 134, 252, 0.2);
+    }
+    
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #bb86fc;
+    }
+    
+    .stat-label {
+      font-size: 0.8rem;
+      color: #9575cd;
+      margin-top: 0.25rem;
+    }
+    
+    .charging-animation {
+      display: none;
+      text-align: center;
+      margin: 1rem 0;
+    }
+    
+    .charging-animation.show {
+      display: block;
+    }
+    
+    .battery-icon {
+      width: 80px;
+      height: 40px;
+      border: 3px solid #bb86fc;
+      border-radius: 8px;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .battery-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #6200ea 0%, #bb86fc 100%);
+      transition: width 0.3s ease;
+    }
+    
+    .battery-tip {
+      position: absolute;
+      right: -8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 8px;
+      height: 20px;
+      background: #bb86fc;
+      border-radius: 0 4px 4px 0;
+    }
+    
+    @media (max-width: 600px) {
+      .input-row {
+        grid-template-columns: 1fr;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .car-display {
+        flex-direction: column;
+        gap: 1rem;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>EVCalc+</h1>
-    <label>Battery Capacity (kWh):</label>
-    <input type="number" id="capacity" value="60.4" step="0.1"><label>Current Battery %:</label>
-<input type="number" id="current" value="65">
+    <header>
+      <h1>
+        <div class="logo-icon">⚡</div>
+        EVCalc+
+      </h1>
+      <p class="subtitle">Advanced EV Charging Calculator</p>
+    </header>
 
-<label>Target Battery %:</label>
-<input type="number" id="target" value="90">
+    <div class="car-selector">
+      <div class="car-display">
+        <div class="car-info">
+          <div class="car-icon">🚗</div>
+          <div class="car-details">
+            <h3 id="selectedCarName">BYD Dolphin Premium</h3>
+            <p id="selectedCarSpecs">60.4 kWh • 13.5 kWh/100km</p>
+          </div>
+        </div>
+        <button class="btn-secondary" onclick="toggleCarSelector()">Change Vehicle</button>
+      </div>
+      
+      <div id="carSelectorForm" style="display: none;">
+        <div class="input-row">
+          <div class="input-group">
+            <label>Brand</label>
+            <select id="carBrand" onchange="updateModels()">
+              <option value="byd">BYD</option>
+              <option value="tesla">Tesla</option>
+              <option value="volkswagen">Volkswagen</option>
+              <option value="bmw">BMW</option>
+              <option value="mercedes">Mercedes-Benz</option>
+              <option value="audi">Audi</option>
+              <option value="hyundai">Hyundai</option>
+              <option value="kia">Kia</option>
+              <option value="nissan">Nissan</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>Model</label>
+            <select id="carModel" onchange="updateCarSpecs()">
+              <option value="dolphin-premium">Dolphin Premium</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
 
-<label>Charging Speed (kW):</label>
-<input type="number" id="speed" value="6.3" step="0.1">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('charging')">⚡ Charging</button>
+      <button class="tab" onclick="switchTab('efficiency')">📊 Efficiency</button>
+      <button class="tab" onclick="switchTab('cost')">💰 Cost</button>
+      <button class="tab" onclick="switchTab('trip')">🗺️ Trip</button>
+    </div>
 
-<button onclick="calculateTime()">Estimate Charge Time</button>
+    <div id="charging" class="tab-content active">
+      <div class="card">
+        <div class="card-header">
+          <span style="font-size: 1.5rem;">⚡</span>
+          <h2>Charging Calculator</h2>
+        </div>
+        
+        <div class="input-row">
+          <div class="input-group">
+            <label>Current Battery %</label>
+            <input type="number" id="current" value="65" min="0" max="100">
+          </div>
+          <div class="input-group">
+            <label>Target Battery %</label>
+            <input type="number" id="target" value="90" min="0" max="100">
+          </div>
+        </div>
+        
+        <div class="input-group">
+          <label>Charging Speed (kW)</label>
+          <select id="chargingType" onchange="updateChargingSpeed()">
+            <option value="2.3">Home Socket (2.3 kW)</option>
+            <option value="3.7">Single Phase (3.7 kW)</option>
+            <option value="6.3" selected>Home Wallbox (6.3 kW)</option>
+            <option value="11">Public AC (11 kW)</option>
+            <option value="22">Fast AC (22 kW)</option>
+            <option value="50">DC Fast (50 kW)</option>
+            <option value="150">DC Superfast (150 kW)</option>
+            <option value="custom">Custom</option>
+          </select>
+          <input type="number" id="speed" value="6.3" step="0.1" style="margin-top: 0.5rem; display: none;">
+        </div>
+        
+        <button class="btn-primary" onclick="calculateTime()">
+          <span>⚡</span> Calculate Charging Time
+        </button>
+        
+        <div class="charging-animation" id="chargingAnimation">
+          <div class="battery-icon">
+            <div class="battery-fill" id="batteryFill"></div>
+            <div class="battery-tip"></div>
+          </div>
+        </div>
+        
+        <div class="result" id="chargingResult"></div>
+      </div>
+    </div>
 
-<div class="result" id="output"></div>
+    <div id="efficiency" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <span style="font-size: 1.5rem;">📊</span>
+          <h2>Efficiency Converter</h2>
+        </div>
+        
+        <div class="input-group">
+          <label>Consumption (kWh/100km)</label>
+          <input type="number" id="consumption" value="13.5" step="0.1">
+        </div>
+        
+        <button class="btn-primary" onclick="convertEfficiency()">
+          <span>🔄</span> Convert Efficiency
+        </button>
+        
+        <div class="result" id="efficiencyResult"></div>
+        
+        <div class="stats-grid" style="margin-top: 2rem;">
+          <div class="stat-card">
+            <div class="stat-value" id="rangeEstimate">448</div>
+            <div class="stat-label">Est. Range (km)</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="mpgeValue">98</div>
+            <div class="stat-label">MPGe</div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-<hr>
+    <div id="cost" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <span style="font-size: 1.5rem;">💰</span>
+          <h2>Cost Calculator</h2>
+        </div>
+        
+        <div class="input-row">
+          <div class="input-group">
+            <label>Currency</label>
+            <select id="currency" onchange="updateCostPreset()">
+              <option value="USD">USD ($)</option>
+              <option value="EUR">EUR (€)</option>
+              <option value="IDR">IDR (Rp)</option>
+              <option value="JPY">JPY (¥)</option>
+              <option value="GBP">GBP (£)</option>
+              <option value="CNY">CNY (¥)</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>Cost per kWh</label>
+            <input type="number" id="cost" value="0.15" step="0.01">
+          </div>
+        </div>
+        
+        <div class="input-group">
+          <label>Charging Location</label>
+          <select id="location" onchange="updateLocationCost()">
+            <option value="home">Home</option>
+            <option value="public">Public Station</option>
+            <option value="fast">Fast Charging</option>
+            <option value="custom">Custom Rate</option>
+          </select>
+        </div>
+        
+        <button class="btn-primary" onclick="calculateCost()">
+          <span>💰</span> Calculate Charging Cost
+        </button>
+        
+        <div class="result" id="costResult"></div>
+      </div>
+    </div>
 
-<label>Consumption (kWh/100km):</label>
-<input type="number" id="consumption" value="13.5" step="0.1">
-<button onclick="convertEfficiency()">Convert to km/kWh</button>
-<div class="result" id="efficiencyOutput"></div>
+    <div id="trip" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <span style="font-size: 1.5rem;">🗺️</span>
+          <h2>Trip Planner</h2>
+        </div>
+        
+        <div class="input-group">
+          <label>Trip Distance (km)</label>
+          <input type="number" id="tripDistance" value="250" step="1">
+        </div>
+        
+        <div class="input-row">
+          <div class="input-group">
+            <label>Starting Battery %</label>
+            <input type="number" id="tripStart" value="90" min="0" max="100">
+          </div>
+          <div class="input-group">
+            <label>Min Battery % at Arrival</label>
+            <input type="number" id="tripMin" value="20" min="0" max="100">
+          </div>
+        </div>
+        
+        <button class="btn-primary" onclick="calculateTrip()">
+          <span>🗺️</span> Plan Trip
+        </button>
+        
+        <div class="result" id="tripResult"></div>
+      </div>
+    </div>
+  </div>
 
-<hr>
+  <script>
+    // Car database
+    const carDatabase = {
+      byd: {
+        'dolphin-premium': { name: 'Dolphin Premium', battery: 60.4, consumption: 13.5 },
+        'dolphin-standard': { name: 'Dolphin Standard', battery: 44.9, consumption: 13.2 },
+        'atto-3': { name: 'Atto 3', battery: 60.5, consumption: 15.6 },
+        'seal': { name: 'Seal', battery: 82.5, consumption: 14.8 },
+        'han': { name: 'Han EV', battery: 85.4, consumption: 16.2 }
+      },
+      tesla: {
+        'model-3-rwd': { name: 'Model 3 RWD', battery: 60, consumption: 13.2 },
+        'model-3-lr': { name: 'Model 3 Long Range', battery: 82, consumption: 14.1 },
+        'model-y-rwd': { name: 'Model Y RWD', battery: 60, consumption: 15.5 },
+        'model-y-lr': { name: 'Model Y Long Range', battery: 82, consumption: 16.8 },
+        'model-s': { name: 'Model S', battery: 100, consumption: 18.1 }
+      },
+      volkswagen: {
+        'id3': { name: 'ID.3', battery: 58, consumption: 15.4 },
+        'id4': { name: 'ID.4', battery: 77, consumption: 17.2 },
+        'id-buzz': { name: 'ID. Buzz', battery: 77, consumption: 20.5 }
+      },
+      bmw: {
+        'i4': { name: 'i4 eDrive40', battery: 83.9, consumption: 16.1 },
+        'ix3': { name: 'iX3', battery: 80, consumption: 18.6 },
+        'ix': { name: 'iX xDrive50', battery: 111.5, consumption: 19.4 }
+      },
+      mercedes: {
+        'eqa': { name: 'EQA 250', battery: 66.5, consumption: 17.5 },
+        'eqb': { name: 'EQB 350', battery: 66.5, consumption: 18.1 },
+        'eqc': { name: 'EQC 400', battery: 80, consumption: 21.5 }
+      },
+      audi: {
+        'q4-etron': { name: 'Q4 e-tron', battery: 82, consumption: 17.8 },
+        'etron-gt': { name: 'e-tron GT', battery: 93.4, consumption: 19.6 }
+      },
+      hyundai: {
+        'kona': { name: 'Kona Electric', battery: 64, consumption: 14.3 },
+        'ioniq-5': { name: 'Ioniq 5', battery: 77.4, consumption: 16.7 },
+        'ioniq-6': { name: 'Ioniq 6', battery: 77.4, consumption: 13.9 }
+      },
+      kia: {
+        'niro-ev': { name: 'Niro EV', battery: 64.8, consumption: 14.7 },
+        'ev6': { name: 'EV6', battery: 77.4, consumption: 16.5 },
+        'ev9': { name: 'EV9', battery: 99.8, consumption: 20.2 }
+      },
+      nissan: {
+        'leaf': { name: 'Leaf', battery: 40, consumption: 16.5 },
+        'leaf-plus': { name: 'Leaf e+', battery: 62, consumption: 17.1 },
+        'ariya': { name: 'Ariya', battery: 87, consumption: 18.3 }
+      }
+    };
 
-<label>Currency:</label>
-<select id="currency">
-  <option value="USD">USD</option>
-  <option value="EUR">EUR</option>
-  <option value="IDR">IDR</option>
-  <option value="JPY">JPY</option>
-</select>
+    // Initialize
+    let currentCar = carDatabase.byd['dolphin-premium'];
+    
+    function toggleCarSelector() {
+      const form = document.getElementById('carSelectorForm');
+      form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    }
 
-<label>Cost per kWh:</label>
-<input type="number" id="cost" value="0.15" step="0.01">
-<button onclick="calculateCost()">Estimate Charging Cost</button>
-<div class="result" id="costOutput"></div>
+    function updateModels() {
+      const brand = document.getElementById('carBrand').value;
+      const modelSelect = document.getElementById('carModel');
+      modelSelect.innerHTML = '';
+      
+      if (brand === 'custom') {
+        modelSelect.innerHTML = '<option value="custom">Custom Vehicle</option>';
+        showCustomInputs();
+      } else {
+        Object.keys(carDatabase[brand]).forEach(modelId => {
+          const option = document.createElement('option');
+          option.value = modelId;
+          option.textContent = carDatabase[brand][modelId].name;
+          modelSelect.appendChild(option);
+        });
+      }
+      
+      updateCarSpecs();
+    }
 
-  </div>  <script>
+    function updateCarSpecs() {
+      const brand = document.getElementById('carBrand').value;
+      const model = document.getElementById('carModel').value;
+      
+      if (brand === 'custom') {
+        currentCar = {
+          name: 'Custom Vehicle',
+          battery: parseFloat(document.getElementById('capacity').value || 60),
+          consumption: parseFloat(document.getElementById('consumption').value || 15)
+        };
+      } else {
+        currentCar = carDatabase[brand][model];
+        document.getElementById('capacity').value = currentCar.battery;
+        document.getElementById('consumption').value = currentCar.consumption;
+      }
+      
+      document.getElementById('selectedCarName').textContent = currentCar.name;
+      document.getElementById('selectedCarSpecs').textContent = 
+        `${currentCar.battery} kWh • ${currentCar.consumption} kWh/100km`;
+      
+      updateRangeEstimate();
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      
+      event.target.classList.add('active');
+      document.getElementById(tabName).classList.add('active');
+    }
+
+    function updateChargingSpeed() {
+      const select = document.getElementById('chargingType');
+      const input = document.getElementById('speed');
+      
+      if (select.value === 'custom') {
+        input.style.display = 'block';
+      } else {
+        input.style.display = 'none';
+        input.value = select.value;
+      }
+    }
+
     function calculateTime() {
-      const cap = parseFloat(document.getElementById('capacity').value);
+      const cap = currentCar.battery;
       const cur = parseFloat(document.getElementById('current').value);
       const tgt = parseFloat(document.getElementById('target').value);
       const spd = parseFloat(document.getElementById('speed').value);
-      const output = document.getElementById('output');
+      
       const percentToAdd = tgt - cur;
       const energyNeeded = (percentToAdd / 100) * cap;
       const time = energyNeeded / spd;
-
-      output.innerHTML = `Estimated charging time: ${time.toFixed(2)} hours<br>
-        Energy to add: ${energyNeeded.toFixed(2)} kWh<br>
-        Battery after charge: ${(cur + percentToAdd).toFixed(1)}%`;
+      const hours = Math.floor(time);
+      const minutes = Math.round((time - hours) * 60);
+      
+      // Show charging animation
+      const animation = document.getElementById('chargingAnimation');
+      const batteryFill = document.getElementById('batteryFill');
+      animation.classList.add('show');
+      batteryFill.style.width = cur + '%';
+      setTimeout(() => {
+        batteryFill.style.width = tgt + '%';
+      }, 100);
+      
+      const result = document.getElementById('chargingResult');
+      result.innerHTML = `
+        <div class="result-item">
+          <span class="result-label">Charging Time</span>
+          <span class="result-value highlight">${hours}h ${minutes}min</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">Energy to Add</span>
+          <span class="result-value">${energyNeeded.toFixed(1)} kWh</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">Final Battery Level</span>
+          <span class="result-value">${tgt}%</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">Range Added</span>
+          <span class="result-value">${((energyNeeded / currentCar.consumption) * 100).toFixed(0)} km</span>
+        </div>
+      `;
+      result.classList.add('show');
     }
 
     function convertEfficiency() {
       const consumption = parseFloat(document.getElementById('consumption').value);
       const kmPerKwh = 100 / consumption;
-      document.getElementById('efficiencyOutput').innerText = `≈ ${kmPerKwh.toFixed(2)} km/kWh`;
+      const mpge = (100 / consumption) * 33.7; // 33.7 kWh = 1 gallon gasoline equivalent
+      
+      const result = document.getElementById('efficiencyResult');
+      result.innerHTML = `
+        <div class="result-item">
+          <span class="result-label">Efficiency</span>
+          <span class="result-value highlight">${kmPerKwh.toFixed(2)} km/kWh</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">Miles per kWh</span>
+          <span class="result-value">${(kmPerKwh * 0.621371).toFixed(2)} mi/kWh</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">Wh per km</span>
+          <span class="result-value">${(consumption * 10).toFixed(0)} Wh/km</span>
+        </div>
+      `;
+      result.classList.add('show');
+      
+      document.getElementById('mpgeValue').textContent = mpge.toFixed(0);
+      updateRangeEstimate();
+    }
+
+    function updateRangeEstimate() {
+      const range = (currentCar.battery / currentCar.consumption) * 100;
+      document.getElementById('rangeEstimate').textContent = range.toFixed(0);
+    }
+
+    function updateCostPreset() {
+      const currency = document.getElementById('currency').value;
+      const costInput = document.getElementById('cost');
+      
+      const presets = {
+        USD: 0.15,
+        EUR: 0.30,
+        IDR: 1450,
+        JPY: 30,
+        GBP: 0.28,
+        CNY: 0.60
+      };
+      
+      costInput.value = presets[currency] || 0.15;
+    }
+
+    function updateLocationCost() {
+      const location = document.getElementById('location').value;
+      const currency = document.getElementById('currency').value;
+      const costInput = document.getElementById('cost');
+      
+      if (location !== 'custom') {
+        const multipliers = {
+          home: 1,
+          public: 1.5,
+          fast: 2.5
+        };
+        
+        const baseCost = {
+          USD: 0.15,
+          EUR: 0.30,
+          IDR: 1450,
+          JPY: 30,
+          GBP: 0.28,
+          CNY: 0.60
+        };
+        
+        costInput.value = (baseCost[currency] * multipliers[location]).toFixed(2);
+      }
     }
 
     function calculateCost() {
-      const cap = parseFloat(document.getElementById('capacity').value);
+      const cap = currentCar.battery;
       const cur = parseFloat(document.getElementById('current').value);
       const tgt = parseFloat(document.getElementById('target').value);
       const cost = parseFloat(document.getElementById('cost').value);
       const currency = document.getElementById('currency').value;
-
+      
       const percentToAdd = tgt - cur;
       const energyNeeded = (percentToAdd / 100) * cap;
       const totalCost = energyNeeded * cost;
-
-      document.getElementById('costOutput').innerText = `Estimated cost: ${currency} ${totalCost.toFixed(2)}`;
+      const fullChargeCost = cap * cost;
+      const costPer100km = currentCar.consumption * cost;
+      
+      const currencySymbols = {
+        USD: '$',
+        EUR: '€',
+        IDR: 'Rp ',
+        JPY: '¥',
+        GBP: '£',
+        CNY: '¥'
+      };
+      
+      const symbol = currencySymbols[currency];
+      
+      const result = document.getElementById('costResult');
+      result.innerHTML = `
+        <div class="result-item">
+          <span class="result-label">Charging Cost</span>
+          <span class="result-value highlight">${symbol}${totalCost.toFixed(2)}</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">Full Charge Cost (0-100%)</span>
+          <span class="result-value">${symbol}${fullChargeCost.toFixed(2)}</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">Cost per 100 km</span>
+          <span class="result-value">${symbol}${costPer100km.toFixed(2)}</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">Cost per km</span>
+          <span class="result-value">${symbol}${(costPer100km / 100).toFixed(3)}</span>
+        </div>
+      `;
+      result.classList.add('show');
     }
 
-    // LocalStorage persistence
-    window.onload = () => {
-      ['capacity', 'current', 'target', 'speed', 'consumption', 'cost', 'currency'].forEach(id => {
-        const el = document.getElementById(id);
-        if (localStorage.getItem(id)) {
-          if (el.tagName === 'SELECT') el.value = localStorage.getItem(id);
-          else el.value = parseFloat(localStorage.getItem(id));
-        }
-        el.addEventListener('change', () => localStorage.setItem(id, el.value));
-      });
-    };
-  </script></body>
+    function calculateTrip() {
+      const distance = parseFloat(document.getElementById('tripDistance').value);
+      const startBattery = parseFloat(document.getElementById('tripStart').value);
+      const minBattery = parseFloat(document.getElementById('tripMin').value);
+      
+      const consumption = currentCar.consumption;
+      const battery = currentCar.battery;
+      
+      const energyNeeded = (distance / 100) * consumption;
+      const batteryPercentNeeded = (energyNeeded / battery) * 100;
+      const arrivalBattery = startBattery - batteryPercentNeeded;
+      
+      const result = document.getElementById('tripResult');
+      
+      if (arrivalBattery < minBattery) {
+        const chargingNeeded = minBattery - arrivalBattery;
+        const rangeWithStart = (startBattery / 100) * battery / consumption * 100;
+        const stopDistance = rangeWithStart * 0.8; // Stop at 80% of range for safety
+        
+        result.innerHTML = `
+          <div class="result-item">
+            <span class="result-label">⚠️ Charging Required</span>
+            <span class="result-value highlight">Yes</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Arrival Battery (without charging)</span>
+            <span class="result-value" style="color: #ff5252;">${arrivalBattery.toFixed(1)}%</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Suggested Charging Stop</span>
+            <span class="result-value">After ${stopDistance.toFixed(0)} km</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Charge to at least</span>
+            <span class="result-value">${(batteryPercentNeeded + minBattery).toFixed(0)}%</span>
+          </div>
+        `;
+      } else {
+        result.innerHTML = `
+          <div class="result-item">
+            <span class="result-label">Trip Feasible</span>
+            <span class="result-value highlight" style="color: #4caf50;">✓ Yes</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Energy Consumption</span>
+            <span class="result-value">${energyNeeded.toFixed(1)} kWh</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Battery at Arrival</span>
+            <span class="result-value">${arrivalBattery.toFixed(1)}%</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Range Reserve</span>
+            <span class="result-value">${((arrivalBattery / 100) * battery / consumption * 100).toFixed(0)} km</span>
+          </div>
+        `;
+      }
+      
+      result.classList.add('show');
+    }
+
+    // Initialize hidden capacity field
+    const capacityInput = document.createElement('input');
+    capacityInput.type = 'hidden';
+    capacityInput.id = 'capacity';
+    capacityInput.value = currentCar.battery;
+    document.body.appendChild(capacityInput);
+
+    // Update range on load
+    updateRangeEstimate();
+  </script>
+</body>
 </html>
