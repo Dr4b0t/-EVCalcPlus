@@ -806,7 +806,8 @@
     }
 
     function updateRangeEstimate() {
-      const range = (currentCar.battery / currentCar.consumption) * 100;
+      const consumption = parseFloat(document.getElementById('consumption').value) || currentCar.consumption;
+      const range = (currentCar.battery / consumption) * 100;
       document.getElementById('rangeEstimate').textContent = range.toFixed(0);
     }
 
