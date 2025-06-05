@@ -474,30 +474,46 @@
       <div class="card">
         <div class="card-header">
           <span style="font-size: 1.5rem;">📊</span>
-          <h2>Efficiency Converter</h2>
+          <h2>Efficiency Calculator</h2>
+        </div>
+        
+        <div style="text-align: center; padding: 2rem 0; background: linear-gradient(135deg, rgba(98, 0, 234, 0.1) 0%, rgba(187, 134, 252, 0.1) 100%); border-radius: 16px; margin-bottom: 2rem;">
+          <div style="font-size: 4rem; font-weight: 700; color: #bb86fc; line-height: 1;" id="kmPerKwhMain">7.4</div>
+          <div style="font-size: 1.5rem; color: #9575cd; margin-top: 0.5rem;">km/kWh</div>
+          <div style="font-size: 1rem; color: #e0e0e0; margin-top: 1rem;">
+            Based on <span id="consumptionDisplay" style="color: #bb86fc; font-weight: 600;">13.5</span> kWh/100km
+          </div>
         </div>
         
         <div class="input-group">
           <label>Consumption (kWh/100km)</label>
-          <input type="number" id="consumption" value="13.5" step="0.1">
+          <input type="number" id="consumption" value="13.5" step="0.1" oninput="convertEfficiency()">
         </div>
         
-        <button class="btn-primary" onclick="convertEfficiency()">
-          <span>🔄</span> Convert Efficiency
-        </button>
-        
-        <div class="result" id="efficiencyResult"></div>
-        
-        <div class="stats-grid" style="margin-top: 2rem;">
+        <div class="stats-grid" style="margin-top: 1.5rem;">
           <div class="stat-card">
             <div class="stat-value" id="rangeEstimate">448</div>
-            <div class="stat-label">Est. Range (km)</div>
+            <div class="stat-label">Range (km)</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="whPerKmValue">135</div>
+            <div class="stat-label">Wh/km</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="miPerKwhValue">4.6</div>
+            <div class="stat-label">mi/kWh</div>
           </div>
           <div class="stat-card">
             <div class="stat-value" id="mpgeValue">98</div>
             <div class="stat-label">MPGe</div>
           </div>
         </div>
+        
+        <button class="btn-primary" onclick="showDetailedEfficiency()" style="margin-top: 1.5rem;">
+          <span>📋</span> Show Detailed Analysis
+        </button>
+        
+        <div class="result" id="efficiencyResult"></div>
       </div>
     </div>
 
@@ -747,26 +763,46 @@
       const consumption = parseFloat(document.getElementById('consumption').value);
       const kmPerKwh = 100 / consumption;
       const mpge = (100 / consumption) * 33.7; // 33.7 kWh = 1 gallon gasoline equivalent
+      const whPerKm = consumption * 10;
+      const miPerKwh = kmPerKwh * 0.621371;
+      
+      // Update main display
+      document.getElementById('kmPerKwhMain').textContent = kmPerKwh.toFixed(1);
+      document.getElementById('consumptionDisplay').textContent = consumption.toFixed(1);
+      
+      // Update stat cards
+      document.getElementById('mpgeValue').textContent = mpge.toFixed(0);
+      document.getElementById('whPerKmValue').textContent = whPerKm.toFixed(0);
+      document.getElementById('miPerKwhValue').textContent = miPerKwh.toFixed(1);
+      updateRangeEstimate();
+    }
+    
+    function showDetailedEfficiency() {
+      const consumption = parseFloat(document.getElementById('consumption').value);
+      const kmPerKwh = 100 / consumption;
+      const mpge = (100 / consumption) * 33.7;
+      const whPerKm = consumption * 10;
       
       const result = document.getElementById('efficiencyResult');
       result.innerHTML = `
         <div class="result-item">
-          <span class="result-label">Efficiency</span>
-          <span class="result-value highlight">${kmPerKwh.toFixed(2)} km/kWh</span>
+          <span class="result-label">Efficiency Rating</span>
+          <span class="result-value highlight">${kmPerKwh < 5 ? 'Low' : kmPerKwh < 7 ? 'Average' : kmPerKwh < 9 ? 'Good' : 'Excellent'}</span>
         </div>
         <div class="result-item">
-          <span class="result-label">Miles per kWh</span>
-          <span class="result-value">${(kmPerKwh * 0.621371).toFixed(2)} mi/kWh</span>
+          <span class="result-label">Annual Energy (15,000 km)</span>
+          <span class="result-value">${(150 * consumption).toFixed(0)} kWh</span>
         </div>
         <div class="result-item">
-          <span class="result-label">Wh per km</span>
-          <span class="result-value">${(consumption * 10).toFixed(0)} Wh/km</span>
+          <span class="result-label">CO₂ Savings vs Petrol</span>
+          <span class="result-value">~${(15000 * 0.12).toFixed(0)} kg/year</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">Efficiency vs Average EV</span>
+          <span class="result-value">${((kmPerKwh / 6.5) * 100 - 100).toFixed(0) > 0 ? '+' : ''}${((kmPerKwh / 6.5) * 100 - 100).toFixed(0)}%</span>
         </div>
       `;
       result.classList.add('show');
-      
-      document.getElementById('mpgeValue').textContent = mpge.toFixed(0);
-      updateRangeEstimate();
     }
 
     function updateRangeEstimate() {
@@ -931,6 +967,8 @@
 
     // Update range on load
     updateRangeEstimate();
+    // Calculate initial efficiency values
+    convertEfficiency();
   </script>
 </body>
 </html>
