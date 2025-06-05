@@ -383,7 +383,99 @@
           <div class="car-details">
             <h3 id="selectedCarName">BYD Dolphin Premium</h3>
             <p id="selectedCarSpecs">60.4 kWh • 13.5 kWh/100km</p>
+            <div id="health" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <span style="font-size: 1.5rem;">🔋</span>
+          <h2>Battery Health Tracker</h2>
+        </div>
+        
+        <div style="text-align: center; padding: 2rem; background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(139, 195, 74, 0.1) 100%); border-radius: 16px; margin-bottom: 2rem;">
+          <div style="font-size: 3.5rem; font-weight: 700; color: #4caf50; line-height: 1;" id="batteryHealthDisplay">95</div>
+          <div style="font-size: 1.3rem; color: #8bc34a; margin-top: 0.5rem;">% Battery Health</div>
+          <div style="font-size: 0.9rem; color: #e0e0e0; margin-top: 0.5rem;">
+            Current Capacity: <span id="currentCapacityDisplay" style="color: #4caf50; font-weight: 600;">57.4</span> kWh
           </div>
+        </div>
+        
+        <div class="input-row">
+          <div class="input-group">
+            <label>Vehicle Age (months)</label>
+            <input type="number" id="vehicleAge" value="12" min="0" onchange="calculateBatteryHealth()">
+          </div>
+          <div class="input-group">
+            <label>Total Distance (km)</label>
+            <input type="number" id="totalDistance" value="15000" min="0" step="100" onchange="calculateBatteryHealth()">
+          </div>
+        </div>
+        
+        <div class="input-row">
+          <div class="input-group">
+            <label>Full Charge Range Now (km)</label>
+            <input type="number" id="currentRange" value="425" step="1" onchange="calculateBatteryHealth()">
+          </div>
+          <div class="input-group">
+            <label>Original Full Range (km)</label>
+            <input type="number" id="originalRange" value="447" step="1">
+          </div>
+        </div>
+        
+        <button class="btn-primary" onclick="calculateBatteryHealth()">
+          <span>📊</span> Analyze Battery Health
+        </button>
+        
+        <div class="result" id="batteryHealthResult" style="display: none;"></div>
+        
+        <div class="card" style="margin-top: 2rem; background: rgba(33, 150, 243, 0.1); border-color: rgba(33, 150, 243, 0.3);">
+          <div class="card-header">
+            <span style="font-size: 1.3rem;">💡</span>
+            <h2 style="font-size: 1.1rem;">Personalized Battery Tips</h2>
+          </div>
+          <div id="batteryTips" style="font-size: 0.95rem; line-height: 1.6;">
+            <div style="margin-bottom: 1rem;">
+              <strong style="color: #2196f3;">🔌 Charging Tips:</strong>
+              <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+                <li>Keep battery between 20-80% for daily use</li>
+                <li>Charge to 100% only for long trips</li>
+                <li>Avoid fast charging when possible - use AC charging for daily needs</li>
+                <li>Don't let battery sit at 0% or 100% for extended periods</li>
+              </ul>
+            </div>
+            <div style="margin-bottom: 1rem;">
+              <strong style="color: #2196f3;">🚗 Driving Tips:</strong>
+              <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+                <li>Use regenerative braking to maximize efficiency</li>
+                <li>Maintain steady speeds on highways</li>
+                <li>Pre-condition while plugged in during extreme weather</li>
+                <li>Keep tires properly inflated for best efficiency</li>
+              </ul>
+            </div>
+            <div id="customTips"></div>
+          </div>
+        </div>
+        
+        <div class="stats-grid" style="margin-top: 2rem;">
+          <div class="stat-card">
+            <div class="stat-value" id="degradationRate">0.4</div>
+            <div class="stat-label">% Monthly Degradation</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="projectedHealth">85</div>
+            <div class="stat-label">Health in 5 Years</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="cycleCount">250</div>
+            <div class="stat-label">Est. Charge Cycles</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="warrantyStatus">✓</div>
+            <div class="stat-label">Warranty Status</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
         </div>
         <button class="btn-secondary" onclick="toggleCarSelector()">Change Vehicle</button>
       </div>
@@ -420,6 +512,7 @@
       <button class="tab" onclick="switchTab('efficiency')">📊 Efficiency</button>
       <button class="tab" onclick="switchTab('cost')">💰 Cost</button>
       <button class="tab" onclick="switchTab('trip')">🗺️ Trip</button>
+      <button class="tab" onclick="switchTab('health')">🔋 Health</button>
     </div>
 
     <div id="charging" class="tab-content active">
@@ -959,6 +1052,107 @@
       result.classList.add('show');
     }
 
+    function calculateBatteryHealth() {
+      const vehicleAge = parseFloat(document.getElementById('vehicleAge').value) || 0;
+      const totalDistance = parseFloat(document.getElementById('totalDistance').value) || 0;
+      const currentRange = parseFloat(document.getElementById('currentRange').value) || 425;
+      const originalRange = parseFloat(document.getElementById('originalRange').value) || 447;
+      
+      // Calculate health based on range
+      const healthFromRange = (currentRange / originalRange) * 100;
+      
+      // Calculate estimated cycles
+      const avgRangePerCharge = 300; // km
+      const estimatedCycles = totalDistance / avgRangePerCharge;
+      
+      // Industry average degradation: 2-3% per year, or 0.17-0.25% per month
+      const monthlyDegradation = (100 - healthFromRange) / (vehicleAge || 1);
+      const yearlyDegradation = monthlyDegradation * 12;
+      
+      // Project future health
+      const projectedMonths = 60; // 5 years
+      const projectedHealth = Math.max(70, healthFromRange - (monthlyDegradation * (projectedMonths - vehicleAge)));
+      
+      // Current capacity
+      const currentCapacity = (healthFromRange / 100) * currentCar.battery;
+      
+      // Update displays
+      document.getElementById('batteryHealthDisplay').textContent = healthFromRange.toFixed(0);
+      document.getElementById('currentCapacityDisplay').textContent = currentCapacity.toFixed(1);
+      document.getElementById('degradationRate').textContent = monthlyDegradation.toFixed(2);
+      document.getElementById('projectedHealth').textContent = projectedHealth.toFixed(0);
+      document.getElementById('cycleCount').textContent = Math.round(estimatedCycles);
+      
+      // Warranty check (typically 70% after 8 years)
+      const warrantyThreshold = 70;
+      const warrantyMonths = 96; // 8 years
+      const projectedHealthAtWarranty = healthFromRange - (monthlyDegradation * (warrantyMonths - vehicleAge));
+      document.getElementById('warrantyStatus').textContent = projectedHealthAtWarranty >= warrantyThreshold ? '✓' : '⚠️';
+      
+      // Update health color
+      const healthDisplay = document.getElementById('batteryHealthDisplay');
+      if (healthFromRange >= 90) {
+        healthDisplay.style.color = '#4caf50'; // Green
+      } else if (healthFromRange >= 80) {
+        healthDisplay.style.color = '#8bc34a'; // Light green
+      } else if (healthFromRange >= 70) {
+        healthDisplay.style.color = '#ff9800'; // Orange
+      } else {
+        healthDisplay.style.color = '#f44336'; // Red
+      }
+      
+      // Generate detailed results
+      const result = document.getElementById('batteryHealthResult');
+      result.innerHTML = `
+        <div class="result-item">
+          <span class="result-label">Annual Degradation Rate</span>
+          <span class="result-value">${yearlyDegradation.toFixed(1)}%</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">Degradation vs Industry Avg</span>
+          <span class="result-value ${yearlyDegradation <= 2.5 ? 'highlight' : ''}" style="${yearlyDegradation > 3 ? 'color: #ff9800;' : ''}">${yearlyDegradation <= 2.5 ? 'Better' : yearlyDegradation <= 3 ? 'Average' : 'Higher'}</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">Estimated Total Cycles</span>
+          <span class="result-value">${Math.round(estimatedCycles)} / ~2000</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">Range Loss</span>
+          <span class="result-value">${(originalRange - currentRange).toFixed(0)} km</span>
+        </div>
+      `;
+      result.style.display = 'block';
+      
+      // Generate custom tips based on health
+      generateCustomTips(healthFromRange, yearlyDegradation, estimatedCycles);
+    }
+    
+    function generateCustomTips(health, degradationRate, cycles) {
+      const tipsDiv = document.getElementById('customTips');
+      let tips = '<div style="margin-bottom: 1rem;"><strong style="color: #2196f3;">🎯 Personalized Recommendations:</strong><ul style="margin: 0.5rem 0; padding-left: 1.5rem;">';
+      
+      if (degradationRate > 3) {
+        tips += '<li style="color: #ff9800;">⚠️ Higher than average degradation detected - consider more AC charging instead of DC fast charging</li>';
+      }
+      
+      if (health < 85) {
+        tips += '<li>Consider battery conditioning: charge to 100% once a month to recalibrate BMS</li>';
+      }
+      
+      if (cycles > 500) {
+        tips += '<li>High cycle count - prioritize shallow cycles (40-60%) when possible</li>';
+      }
+      
+      if (health > 95) {
+        tips += '<li style="color: #4caf50;">✨ Excellent battery health! Keep up your current charging habits</li>';
+      }
+      
+      tips += '<li>Optimal charging speed for battery longevity: 6-11 kW AC charging</li>';
+      tips += '</ul></div>';
+      
+      tipsDiv.innerHTML = tips;
+    }
+
     // Initialize hidden capacity field
     const capacityInput = document.createElement('input');
     capacityInput.type = 'hidden';
@@ -970,6 +1164,8 @@
     updateRangeEstimate();
     // Calculate initial efficiency values
     convertEfficiency();
+    // Calculate initial battery health
+    calculateBatteryHealth();
   </script>
 </body>
 </html>
